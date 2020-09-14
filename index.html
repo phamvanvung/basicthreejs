@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic three.js</title>
+    <script src="lib/three.js"></script>
+    <script src="lib/OrbitControls.js"></script>
+</head>
+<body>
+<script>
+    //Global variables
+    let renderer, scene, camera;
+    // Canvas size
+    let width = window.innerWidth - 16; //-2*8 for default margins
+    let height = window.innerHeight - 16;
+    let orbitControls;
+
+    function init() {
+        // Creating the scene
+        scene = new THREE.Scene();
+
+        // The renderer
+        renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0x000000, 1.0);
+        renderer.setSize(width, height);
+        renderer.shadowMap.enabled = true;
+
+        // The camera
+        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 16;
+        camera.lookAt(scene.position);
+
+        //Control the camera and render it to the dom
+        orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+
+
+        // This function will fill objects to  the scene
+        fillObjectsToScene();
+
+        //Add the renderer element to the document.
+        document.body.appendChild(renderer.domElement);
+
+        //Render for the first time.
+        render(); // This function renders the scene using the camera
+    }
+
+    function fillObjectsToScene(array, offset) {
+        //Cube
+        let cubeGeometry = new THREE.CubeGeometry(6, 4, 6);
+        let cubeMaterial = new THREE.MeshLambertMaterial({color: 'red'});
+        let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.name = 'cube';
+        cube.castShadow = true;
+        scene.add(cube);
+        //Plane
+        let planeGeometry = new THREE.PlaneGeometry(20, 20);
+        let planeMaterial = new THREE.MeshLambertMaterial({color: 0xcccccc});
+        let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+        plane.rotation.x = -0.5 * Math.PI;
+        plane.position.y = -2;
+        scene.add(plane);
+        let ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+        scene.add(ambientLight);
+        //Light
+        let spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(10, 20, 20);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+    }
+
+    function render() {
+        orbitControls.update();
+        renderer.render(scene, camera);
+        //Render using requestAnimationFrame
+        requestAnimationFrame(render);
+    }
+
+    //Start
+    window.onload = init;
+
+</script>
+</body>
+</html>
